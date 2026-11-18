@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+/* Self-hosted heading font (Cormorant Garamond, latin subset, ~60 KB) */
+@font-face {
+  font-family: "TB Serif";
+  src: url("./fonts/cormorant-garamond.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+/* ------------------------------------------------------------------------------------
+   TriBloom design tokens
+   The green scale below replaces Tailwind's default "emerald" everywhere in the app,
+   so every existing emerald button, badge and chart picks up the TriBloom greens.
+   ------------------------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "TB Serif", Georgia, "Times New Roman", serif;
+
+  --color-emerald-50: #eef5ef;
+  --color-emerald-100: #d7e8db;
+  --color-emerald-200: #b2d2ba;
+  --color-emerald-300: #86b694;
+  --color-emerald-400: #5c9970;
+  --color-emerald-500: #3e7d57;
+  --color-emerald-600: #2f6b47;
+  --color-emerald-700: #25573a;
+  --color-emerald-800: #1f4630;
+  --color-emerald-900: #1a3a28;
+  --color-emerald-950: #0f2318;
+
+
+  /* Blues/teals become a muted petrol and purples/pinks a wine tone, so the module
+     pages share the TriBloom palette. Amber (warning) and rose/red (problems) keep
+     their usual meaning. */
+  --color-blue-50: #eef4f4;
+  --color-blue-100: #d6e5e5;
+  --color-blue-200: #b0cccd;
+  --color-blue-300: #84adaf;
+  --color-blue-400: #5d8e91;
+  --color-blue-500: #427477;
+  --color-blue-600: #345e62;
+  --color-blue-700: #2b4d50;
+  --color-blue-800: #243f42;
+  --color-blue-900: #1e3437;
+  --color-blue-950: #112022;
+  --color-sky-50: #eef4f4;
+  --color-sky-100: #d6e5e5;
+  --color-sky-200: #b0cccd;
+  --color-sky-300: #84adaf;
+  --color-sky-400: #5d8e91;
+  --color-sky-500: #427477;
+  --color-sky-600: #345e62;
+  --color-sky-700: #2b4d50;
+  --color-sky-800: #243f42;
+  --color-sky-900: #1e3437;
+  --color-sky-950: #112022;
+  --color-cyan-50: #eef4f4;
+  --color-cyan-100: #d6e5e5;
+  --color-cyan-200: #b0cccd;
+  --color-cyan-300: #84adaf;
+  --color-cyan-400: #5d8e91;
+  --color-cyan-500: #427477;
+  --color-cyan-600: #345e62;
+  --color-cyan-700: #2b4d50;
+  --color-cyan-800: #243f42;
+  --color-cyan-900: #1e3437;
+  --color-cyan-950: #112022;
+  --color-teal-50: #eef4f4;
+  --color-teal-100: #d6e5e5;
+  --color-teal-200: #b0cccd;
+  --color-teal-300: #84adaf;
+  --color-teal-400: #5d8e91;
+  --color-teal-500: #427477;
+  --color-teal-600: #345e62;
+  --color-teal-700: #2b4d50;
+  --color-teal-800: #243f42;
+  --color-teal-900: #1e3437;
+  --color-teal-950: #112022;
+  --color-indigo-50: #eef4f4;
+  --color-indigo-100: #d6e5e5;
+  --color-indigo-200: #b0cccd;
+  --color-indigo-300: #84adaf;
+  --color-indigo-400: #5d8e91;
+  --color-indigo-500: #427477;
+  --color-indigo-600: #345e62;
+  --color-indigo-700: #2b4d50;
+  --color-indigo-800: #243f42;
+  --color-indigo-900: #1e3437;
+  --color-indigo-950: #112022;
+  --color-purple-50: #fbf0f2;
+  --color-purple-100: #f5dbe0;
+  --color-purple-200: #ebb8c2;
+  --color-purple-300: #dc8c9d;
+  --color-purple-400: #c76178;
+  --color-purple-500: #b0435c;
+  --color-purple-600: #94344b;
+  --color-purple-700: #7a2b3e;
+  --color-purple-800: #652636;
+  --color-purple-900: #552230;
+  --color-purple-950: #300f18;
+  --color-violet-50: #fbf0f2;
+  --color-violet-100: #f5dbe0;
+  --color-violet-200: #ebb8c2;
+  --color-violet-300: #dc8c9d;
+  --color-violet-400: #c76178;
+  --color-violet-500: #b0435c;
+  --color-violet-600: #94344b;
+  --color-violet-700: #7a2b3e;
+  --color-violet-800: #652636;
+  --color-violet-900: #552230;
+  --color-violet-950: #300f18;
+  --color-fuchsia-50: #fbf0f2;
+  --color-fuchsia-100: #f5dbe0;
+  --color-fuchsia-200: #ebb8c2;
+  --color-fuchsia-300: #dc8c9d;
+  --color-fuchsia-400: #c76178;
+  --color-fuchsia-500: #b0435c;
+  --color-fuchsia-600: #94344b;
+  --color-fuchsia-700: #7a2b3e;
+  --color-fuchsia-800: #652636;
+  --color-fuchsia-900: #552230;
+  --color-fuchsia-950: #300f18;
+  --color-pink-50: #fbf0f2;
+  --color-pink-100: #f5dbe0;
+  --color-pink-200: #ebb8c2;
+  --color-pink-300: #dc8c9d;
+  --color-pink-400: #c76178;
+  --color-pink-500: #b0435c;
+  --color-pink-600: #94344b;
+  --color-pink-700: #7a2b3e;
+  --color-pink-800: #652636;
+  --color-pink-900: #552230;
+  --color-pink-950: #300f18;
+
+  --color-tb-forest: #1f3a2b;
+  --color-tb-forest-2: #2c4a38;
+  --color-tb-sage: #8fa58c;
+  --color-tb-ivory: #f7f3ea;
+  --color-tb-cream: #efe7d6;
+  --color-tb-line: #e7e0d2;
+  --color-tb-gold: #b89b5e;
+  --color-tb-rose: #b5223a;
+  --color-tb-ink: #22281f;
+  --color-tb-muted: #66705f;
+}
+
+@layer base {
+  :root {
+    --background: #f7f3ea;
+    --foreground: #22281f;
+    --primary: #1f3a2b;
+    --accent: #3e7d57;
+    --border: #e7e0d2;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Phones: avoid iOS zooming into inputs, and give fingers room */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid #3e7d57;
+    outline-offset: 2px;
+  }
+}
+
+/* Brand serif for headlines */
+.font-serif-brand {
+  font-family: var(--font-serif);
+  letter-spacing: 0;
+}
+
+/* Page titles across all modules get the brand serif */
+main h1 {
+  font-family: var(--font-serif);
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cfc6b4;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8fa58c;
+}
+
+/* Cards */
+.farm-card {
+  background: #ffffff;
+  border: 1px solid #e7e0d2;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(31, 58, 43, 0.04);
+}
+
+.farm-card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.farm-card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -8px rgba(31, 58, 43, 0.14);
+  border-color: #8fa58c;
+}
+
+/* Wide tables scroll sideways on phones instead of breaking the page */
+main table {
+  min-width: 640px;
+}
+main .overflow-x-auto,
+main [class*="overflow-x-auto"] {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media print {
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+}
