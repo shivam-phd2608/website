@@ -1,7 +1,12 @@
 /* TriBloom Farms · website behaviour (no libraries needed) */
 
-// Change this one number if enquiries should go to a different WhatsApp.
-const WHATSAPP_NUMBER = "919148869977"; // country code + number, no "+" or spaces
+// ---------- Settings you may change ----------
+// WhatsApp number: country code + number, no "+" or spaces
+const WHATSAPP_NUMBER = "918088285812";
+// Google Apps Script web app URL that emails enquiries (ends in /exec).
+// Leave empty and the form will open WhatsApp instead.
+const ENQUIRY_URL = "https://script.google.com/macros/s/AKfycbxbGuvCqQMs8UuDMM2pzve377sxDLxRdoT7f7SRZOteyc1FiwD_MCeKEzxYSlA8d0K0jg/exec";
+// ----------------------------------------------
 
 (function () {
   const header = document.getElementById("siteHeader");
@@ -82,31 +87,52 @@ const WHATSAPP_NUMBER = "919148869977"; // country code + number, no "+" or spac
   document.getElementById("lbClose").addEventListener("click", closeLightbox);
   lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
 
-  // Enquiry form → WhatsApp message
+  // Enquiry form → email (via Google Apps Script), or WhatsApp if not set up
   const form = document.getElementById("quoteForm");
   const err = document.getElementById("formError");
-  form.addEventListener("submit", (e) => {
+  const ok = document.getElementById("formOk");
+  const btn = document.getElementById("quoteBtn");
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    err.textContent = "";
+    err.textContent = ""; ok.textContent = "";
     const f = new FormData(form);
-    const name = (f.get("name") || "").toString().trim();
-    const country = (f.get("country") || "").toString().trim();
-    form.name.classList.toggle("invalid", !name);
-    form.country.classList.toggle("invalid", !country);
-    if (!name || !country) { err.textContent = "Please add your name and country/city."; return; }
-    const varieties = f.getAll("v").join(", ");
-    const lines = [
-      "Hello TriBloom Farms, I'd like a quote.",
-      "",
-      "Name: " + name,
-      f.get("company") ? "Company: " + f.get("company") : "",
-      "Country/city: " + country,
-      varieties ? "Interested in: " + varieties : "",
-      f.get("volume") ? "Weekly volume: " + f.get("volume") : "",
-      f.get("message") ? "Message: " + f.get("message") : "",
-    ].filter((l, i) => l !== "" || i === 1);
-    window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lines.join("\n")), "_blank", "noopener");
+    const val = (k) => (f.get(k) || "").toString().trim();
+    const data = {
+      name: val("name"), company: val("company"), email: val("email"), phone: val("phone"),
+      country: val("country"), volume: val("volume"), varieties: f.getAll("v").join(", "),
+      message: val("message"), website: val("website"), page: location.href,
+    };
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+    form.name.classList.toggle("invalid", !data.name);
+    form.email.classList.toggle("invalid", !emailOk);
+    form.country.classList.toggle("invalid", !data.country);
+    if (!data.name || !emailOk || !data.country) { err.textContent = "Please add your name, a valid email and your country/city."; return; }
+
+    if (!ENQUIRY_URL) { openWhatsApp(data); return; }
+
+    btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const res = await fetch(ENQUIRY_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) });
+      const out = await res.json();
+      if (!out.ok) throw new Error(out.error || "failed");
+      form.reset();
+      ok.textContent = "Thank you, " + data.name + ". Your enquiry has reached us and we'll reply soon.";
+    } catch (ex) {
+      err.textContent = "Sorry, we couldn't send that just now. Please WhatsApp or call +91 80882 85812.";
+    } finally {
+      btn.disabled = false; btn.textContent = "Send enquiry";
+    }
   });
+
+  function openWhatsApp(d) {
+    const lines = [
+      "Hello TriBloom Farms, I'd like a quote.", "",
+      "Name: " + d.name, d.company && "Company: " + d.company, "Email: " + d.email, d.phone && "Phone: " + d.phone,
+      "Country/city: " + d.country, d.varieties && "Interested in: " + d.varieties,
+      d.volume && "Weekly volume: " + d.volume, d.message && "Message: " + d.message,
+    ].filter((l) => l !== "" && l !== undefined && l !== false || false).join("\n");
+    window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lines), "_blank", "noopener");
+  }
 
   document.getElementById("waFloat").href = "https://wa.me/" + WHATSAPP_NUMBER;
   document.getElementById("year").textContent = new Date().getFullYear();
